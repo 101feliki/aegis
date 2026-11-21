@@ -1,6 +1,11 @@
 # Python
 __pycache__/
 *.pyc
+*.egg-info/
+
+# Release build output (rebuild with: python packaging/build.py)
+dist/
+build/
 
 # AEGIS run output - client evidence never goes into the repo
 audit.jsonl

@@ -389,9 +389,16 @@ def cmd_run(args) -> int:
 
 
 def cmd_schedule(args) -> int:
+    from . import build_info
     cfg = os.path.abspath(args.config)
     py = sys.executable
-    here = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+    b = build_info()
+    if b["kind"] == "pyz":                     # single-file release: run the .pyz directly
+        here = os.path.dirname(b["location"])
+        launch = f"{py} {b['location']}"
+    else:
+        here = os.path.dirname(b["location"])
+        launch = f"{py} -m aegis"
     every = args.every
     user = getpass.getuser()
     print("Run one guard cycle on a timer. Pick the block for the client's server. Nothing below has been executed.\n")
@@ -405,7 +412,7 @@ Type=oneshot
 User=aegis
 WorkingDirectory={here}
 EnvironmentFile=/etc/aegis/aegis.env
-ExecStart={py} -m aegis guard run --config {cfg}
+ExecStart={launch} guard run --config {cfg}
 SuccessExitStatus=0 3 4
 """)
     print(f"""[Unit]
@@ -420,14 +427,16 @@ Persistent=true
 WantedBy=timers.target
 """)
     print("  then: systemctl daemon-reload && systemctl enable --now aegis-guard.timer")
-    print("  /etc/aegis/aegis.env (chmod 600, owner aegis) holds AEGIS_DB_PASSWORD=... and AEGIS_TAMPER_KEY=...\n")
+    print("  /etc/aegis/aegis.env (chmod 600, owner aegis) holds AEGIS_DB_PASSWORD=... "
+          "(NOT AEGIS_TAMPER_KEY - the seal key stays with the assessor)\n")
     print("== Linux, cron ==")
-    print(f"*/{every} * * * * cd {here} && {py} -m aegis guard run --config {cfg} >> /var/log/aegis-guard.log 2>&1\n"
+    print(f"*/{every} * * * * cd {here} && {launch} guard run --config {cfg} >> /var/log/aegis-guard.log 2>&1\n"
           if every < 60 else
-          f"0 */{max(1, every // 60)} * * * cd {here} && {py} -m aegis guard run --config {cfg} >> /var/log/aegis-guard.log 2>&1\n")
+          f"0 */{max(1, every // 60)} * * * cd {here} && {launch} guard run --config {cfg} >> /var/log/aegis-guard.log 2>&1\n")
     print("== Windows Task Scheduler (run in an elevated prompt) ==")
+    tr = (f'\\"{py}\\" \\"{b["location"]}\\"' if b["kind"] == "pyz" else f'\\"{py}\\" -m aegis')
     print(f'schtasks /Create /TN "AEGIS guard" /SC MINUTE /MO {every} /RU "{user}" '
-          f'/TR "\\"{py}\\" -m aegis guard run --config \\"{cfg}\\"" /F')
+          f'/TR "{tr} guard run --config \\"{cfg}\\"" /F')
     print(f"  (working directory must be {here}; set AEGIS_DB_PASSWORD as a machine environment variable "
           "or use a credential-manager wrapper)")
     return 0

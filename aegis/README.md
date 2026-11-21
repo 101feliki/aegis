@@ -27,7 +27,19 @@ Built for the betting-operator engagement: it proves what an authorized tester c
 
 ## Install
 
-Nothing to install. Copy the `aegis/` folder and run it with Python 3.11+.
+Python 3.10 or newer, nothing else.
+
+| Where | How |
+|---|---|
+| Client's Linux server | Release tarball: `tar xzf aegis-<ver>-linux.tar.gz && cd aegis-<ver> && sha256sum -c SHA256SUMS && sudo ./install.sh`. Creates a locked-down `aegis` account (reads any file via `CAP_DAC_READ_SEARCH`, writes only to `/var/lib/aegis`), installs the systemd timer **without starting it**, and runs the selftest. `sudo ./uninstall.sh` archives the evidence and removes everything. Admin guide: [packaging/INSTALL.md](../packaging/INSTALL.md) |
+| Any machine, one file | `python3 aegis-<ver>.pyz --help`. Single file with the MySQL/MariaDB and PostgreSQL drivers bundled: no pip, no internet |
+| Your laptop | `pip install .` (or `pip install ".[mysql,postgres]"`), then the `aegis` command; or `python -m aegis` from the repo |
+
+Build the release: `python packaging/build.py` → `dist/` (`.pyz`, Linux tarball, `SHA256SUMS`). The build is
+reproducible, with drivers pinned in `packaging/vendor-requirements.txt` to versions that support Python 3.10, and
+`packaging/check_py310.py` verifies 3.10 syntax. Every audit log records the running build's SHA-256 (the `.pyz` hash
+matches `SHA256SUMS`), so the report proves which build produced the evidence. MySQL is read over **TLS** whenever the
+server offers it (MySQL 8 does by default); set `AEGIS_DB_CA=/path/ca.pem` to also verify the server certificate.
 
 ```
 python -m aegis --version

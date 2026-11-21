@@ -107,6 +107,12 @@ def build_markdown(audit_path: str) -> str:
     lines.append(f"- **First action:** {header.get('ts','?')}")
     lines.append(f"- **Actions authorized (GRANT):** {grants}")
     lines.append(f"- **Actions refused (DENY):** {denies}")
+    builds = sorted({(r["detail"].get("tool"), r["detail"].get("tool_sha256")) for r in rows
+                     if r.get("action") == "preflight" and (r.get("detail") or {}).get("tool_sha256")})
+    for tool, sha in builds:
+        lines.append(f"- **Tool build:** {tool}, code SHA-256 `{sha}`")
+    if len(builds) > 1:
+        lines.append("  _(more than one build ran during this engagement - each is listed above)_")
     lines.append("")
     lines.append("## Evidence integrity")
     lines.append("")

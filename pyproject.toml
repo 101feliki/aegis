@@ -1,0 +1,30 @@
+[build-system]
+requires = ["setuptools>=61"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "aegis-assess"
+dynamic = ["version"]
+description = "AEGIS - authorization-first, read-only money integrity and server watchdog for betting operators"
+readme = "aegis/README.md"
+requires-python = ">=3.10"
+dependencies = []                      # core is pure standard library
+
+[project.optional-dependencies]
+mysql = ["pymysql"]
+postgres = ["pg8000"]
+mssql = ["pyodbc"]
+oracle = ["oracledb"]
+all = ["pymysql", "pg8000", "pyodbc", "oracledb"]
+
+[project.scripts]
+aegis = "aegis.cli:main"
+
+[tool.setuptools.dynamic]
+version = { attr = "aegis.__version__" }
+
+[tool.setuptools.packages.find]
+include = ["aegis*"]
+
+[tool.setuptools.package-data]
+aegis = ["*.md", "client-pack/*.md"]

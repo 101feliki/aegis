@@ -257,7 +257,10 @@ def cmd_report(args) -> int:
 
 def build_parser() -> argparse.ArgumentParser:
     p = argparse.ArgumentParser(prog="aegis", description=f"{TOOL_NAME} - authorized, auditable assessment harness")
-    p.add_argument("--version", action="version", version=f"{TOOL_NAME} {__version__}")
+    from . import build_info
+    b = build_info()
+    p.add_argument("--version", action="version",
+                   version=f"{TOOL_NAME} {__version__} ({b['kind']} build, sha256 {b['code_sha256'][:16]}…)")
     sub = p.add_subparsers(dest="cmd", required=True)
 
     s = sub.add_parser("init-scope", help="write an example scope file")

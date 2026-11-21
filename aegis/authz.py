@@ -46,10 +46,13 @@ class Authorizer:
         if not self.scope.window_active():
             return self._deny("preflight", "scope",
                               f"outside authorized window ({self.scope.window_start} .. {self.scope.window_end})")
+        from . import build_info
+        b = build_info()
         self.audit.append("authorization", action="preflight", target=self.scope.engagement_id,
                           decision="GRANT",
                           detail={"signed": self.signature_verified,
-                                  "authorized_by": self.scope.authorized_by})
+                                  "authorized_by": self.scope.authorized_by,
+                                  "tool": b["tool"], "tool_build": b["kind"], "tool_sha256": b["code_sha256"]})
         return Decision(True, "preflight ok")
 
     def authorize(self, action: str, host: str, ip: str | None = None, port: int | None = None) -> Decision:

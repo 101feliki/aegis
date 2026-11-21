@@ -20,5 +20,41 @@ Design principles
    the chain so counsel can confirm it was not edited after the fact.
 """
 
-__version__ = "1.0.0"
+__version__ = "1.1.0"
 TOOL_NAME = "AEGIS"
+
+_BUILD = None
+
+
+def build_info() -> dict:
+    """Which exact build is running: version + SHA-256 of the code.
+
+    Recorded in the audit log at every preflight, so counsel can later prove which
+    build of the tool produced the evidence (and that it was not modified). For the
+    single-file release the hash is of the .pyz itself, matching SHA256SUMS."""
+    global _BUILD
+    if _BUILD is not None:
+        return _BUILD
+    import hashlib
+    import os
+    pkg = os.path.dirname(os.path.abspath(__file__))
+    archive = os.path.dirname(pkg)
+    h = hashlib.sha256()
+    if os.path.isfile(archive):                         # running from aegis-x.y.z.pyz
+        kind = "pyz"
+        with open(archive, "rb") as fh:
+            for chunk in iter(lambda: fh.read(1 << 20), b""):
+                h.update(chunk)
+    else:
+        kind = "source"
+        for root, dirs, files in os.walk(pkg):
+            dirs[:] = sorted(d for d in dirs if d != "__pycache__")
+            for f in sorted(files):
+                if f.endswith(".py"):
+                    p = os.path.join(root, f)
+                    h.update(os.path.relpath(p, pkg).replace("\\", "/").encode())
+                    with open(p, "rb") as fh:
+                        h.update(fh.read().replace(b"\r\n", b"\n"))
+    _BUILD = {"tool": f"{TOOL_NAME} {__version__}", "kind": kind, "code_sha256": h.hexdigest(),
+              "location": archive if kind == "pyz" else pkg}
+    return _BUILD

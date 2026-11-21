@@ -514,8 +514,13 @@ def load_baseline(state_dir: str) -> dict:
         return json.load(fh)
 
 
-def baseline_integrity(audit_path: str, bpath: str, base: dict, key: str | None) -> list[str]:
-    """Reasons to distrust the baseline file (empty list = trustworthy)."""
+def baseline_integrity(audit_path: str, bpath: str, base: dict, key: str | None,
+                       notes: list | None = None) -> list[str]:
+    """Reasons to distrust the baseline file (empty list = trustworthy).
+
+    A signed baseline checked WITHOUT the key is not a tamper sign - the key is meant to
+    stay off the server. The audit-log anchor is still verified; the unverified seal is
+    added to `notes` (coverage) instead."""
     from ..audit import AuditLog
     out = []
     ok, msg = AuditLog.verify(audit_path)
@@ -529,7 +534,10 @@ def baseline_integrity(audit_path: str, bpath: str, base: dict, key: str | None)
         out.append(f"fingerprint file hash {now_sha[:12]} != hash recorded at approval {anchor[:12]}")
     if base.get("signed"):
         if not key:
-            out.append("baseline is signed but no key was supplied to verify it")
+            if notes is not None:
+                notes.append("The baseline's HMAC seal was not verified this run (seal key not present - by design it "
+                             "stays off the server). The audit-log anchor WAS verified. Run `aegis tamper check` with "
+                             "AEGIS_TAMPER_KEY set from the assessor's machine to verify the seal.")
         elif not hmac.compare_digest(base.get("signature", ""),
                                      hmac.new(key.encode(), canonical(base), hashlib.sha256).hexdigest()):
             out.append("HMAC signature does not match")
@@ -543,7 +551,8 @@ def run_check(authz, machine: str, state_dir: str, db=None, key: str | None = No
     if why:
         return {"check": "tamper", "authorized": False, "reason": why}
 
-    integrity = baseline_integrity(authz.audit.path, bpath, base, key)
+    seal_notes: list[str] = []
+    integrity = baseline_integrity(authz.audit.path, bpath, base, key, seal_notes)
     now_sha = file_sha(bpath)
 
     files, missing, unreadable = fingerprint_files(base["paths"], base.get("excludes") or DEFAULT_EXCLUDES)
@@ -554,6 +563,7 @@ def run_check(authz, machine: str, state_dir: str, db=None, key: str | None = No
     coverage = [f"Watching {len(base['paths'])} path(s), {len(files)} file(s); baseline approved "
                 f"{base.get('created')} by {base.get('approved_by') or '(not named)'}"
                 + (f" - {base['note']}" if base.get("note") else "") + "."]
+    coverage.extend(seal_notes)
     if unreadable:
         coverage.append(f"{unreadable} file(s) could not be read (permissions) and were not compared.")
     if base.get("db") and db is None:

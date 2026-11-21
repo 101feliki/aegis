@@ -186,6 +186,10 @@ def cmd_tamper(args) -> int:
             print("approve needs --by \"<name, role>\" and --note \"<what was deployed / ticket>\" - the approval is "
                   "evidence.", file=sys.stderr)
             return 2
+        if args.action == "approve" and prev.get("signed") and not _seal_key(args):
+            print(f"the current baseline is HMAC-sealed: set {args.seal_key_env} to approve (otherwise the new "
+                  "baseline would silently lose its seal).", file=sys.stderr)
+            return 2
 
     # The database is only touched when given on this run; if the baseline covers one and it
     # is missing, the check reports that as a coverage gap rather than silently skipping it.

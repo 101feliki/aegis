@@ -25,6 +25,7 @@ import csv
 import os
 import re
 import sqlite3
+import ssl
 
 from .identify import classify, driver_status, redact
 
@@ -328,7 +329,26 @@ def _network(engine: str, p: dict, password: str | None):
     if engine == "mysql":
         if drv == "pymysql":
             import pymysql
-            conn = pymysql.connect(host=host, port=int(port), user=user, password=pw or "", database=db)
+            # TLS whenever the server offers it (MySQL 8 does by default): the money data is encrypted in
+            # transit, and MySQL 8's default login (caching_sha2_password) then needs no compiled crypto
+            # library - so the single-file release works on a bare server. AEGIS_DB_CA = verify the cert.
+            ca = os.environ.get("AEGIS_DB_CA")
+            if ca:
+                ctx = ssl.create_default_context(cafile=ca)
+            else:
+                ctx = ssl.create_default_context()
+                ctx.check_hostname = False
+                ctx.verify_mode = ssl.CERT_NONE
+            try:
+                conn = pymysql.connect(host=host, port=int(port), user=user, password=pw or "", database=db, ssl=ctx)
+            except RuntimeError as e:
+                if "cryptography" in str(e):
+                    raise DriverMissing(
+                        "this MySQL server offers no TLS, and its login method (caching_sha2_password) then needs the "
+                        "'cryptography' package. Options: enable TLS on the server (recommended - also encrypts the "
+                        "data AEGIS reads), or `pip install cryptography`, or have the DBA create the monitoring login "
+                        "WITH mysql_native_password (MySQL 8.0 only).") from e
+                raise
         elif drv == "mysql.connector":
             import mysql.connector
             conn = mysql.connector.connect(host=host, port=int(port), user=user, password=pw or "", database=db)

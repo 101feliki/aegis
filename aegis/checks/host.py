@@ -600,9 +600,11 @@ def checkup(root: str | None = None, app_dirs: list[str] | None = None, web_root
         check_firewall(h, F, cov)
         check_cron(h, F, cov)
         check_clock(h, F)
-        if h.live and hasattr(os, "geteuid") and os.geteuid() != 0:
-            cov.append("Not running as root: some files could not be read (noted above). Read-only root access "
-                       "gives a complete check-up.")
+        if h.live and hasattr(os, "geteuid") and os.geteuid() != 0 and h.read("/etc/shadow", 1) is None:
+            # (os.access ignores Linux capabilities, so actually try to read)
+            cov.append("Running without read access to protected system files: some checks were partial (noted "
+                       "above). The packaged install runs with read-only access to every file (CAP_DAC_READ_SEARCH) "
+                       "for a complete check-up.")
     # Admin-port findings carry their own level (e.g. Docker API = CRITICAL): reflect it in the title severity.
     res = F.list()
     for f in res:
