@@ -1,0 +1,30 @@
+# Python
+__pycache__/
+*.pyc
+
+# AEGIS run output - client evidence never goes into the repo
+audit.jsonl
+*-results.json
+results.json
+report.md
+alerts.jsonl
+history.jsonl
+guard-*.jsonl
+watch-state.json
+guard-state.json
+tamper-baseline.json
+ledger-map*.json
+ledger-map-signoff.md
+access.sql
+runs/
+demo/
+assess*/
+eng*/
+
+# Secrets
+*.key
+key.txt
+scope.json
+*.env
+.env
+aegis-guard.json
