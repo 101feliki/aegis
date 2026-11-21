@@ -238,6 +238,27 @@ def cmd_assess(args) -> int:
     return 0
 
 
+def cmd_ui(args) -> int:
+    state = args.state
+    if args.config:
+        from .guard import Config
+        state = Config(args.config).out
+    if args.demo:
+        import tempfile
+        from .demo_guard import build
+        work = tempfile.mkdtemp(prefix="aegis-demo-ui-")
+        print(f"{TOOL_NAME}: building the demo monitor in {work} (about a minute) ...")
+        state = build(work)
+    if not state:
+        from .ui import serve as serve_console           # no guard to show: website-check console only
+        return serve_console(args.host, args.port)
+    if not os.path.isdir(state):
+        print(f"state folder not found: {state}", file=sys.stderr)
+        return 2
+    from .dashboard import serve
+    return serve(state, args.host, args.port)
+
+
 def cmd_verify_audit(args) -> int:
     ok, msg = AuditLog.verify(args.audit)
     print(("AUDIT INTACT: " if ok else "AUDIT FAILED: ") + msg)
@@ -302,10 +323,13 @@ def build_parser() -> argparse.ArgumentParser:
     s = sub.add_parser("tools", help="show which optional external collectors are installed")
     s.set_defaults(func=cmd_tools)
 
-    s = sub.add_parser("ui", help="launch the local operator console (type-a-website field)")
-    s.add_argument("--host", default="127.0.0.1")
+    s = sub.add_parser("ui", help="dashboard for the guard (--state/--config/--demo), or the website-check console")
+    s.add_argument("--state", help="guard state folder to show (e.g. /var/lib/aegis/guard)")
+    s.add_argument("--config", help="guard config; its 'out' folder is shown")
+    s.add_argument("--demo", action="store_true", help="build demo data with planted problems and show it")
+    s.add_argument("--host", default="127.0.0.1", help="listen address (non-local needs AEGIS_UI_PASSWORD)")
     s.add_argument("--port", type=int, default=8787)
-    s.set_defaults(func=lambda a: __import__("aegis.ui", fromlist=["serve"]).serve(a.host, a.port))
+    s.set_defaults(func=cmd_ui)
 
     from .dbcli import register as register_db
     register_db(sub)

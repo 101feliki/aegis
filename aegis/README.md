@@ -234,6 +234,22 @@ stop the others. `mpesa.statement` may be a folder: the newest CSV is used, so o
 there. Outputs: `guard-alerts.jsonl`, `guard-history.jsonl`, per-module results, one `report.md` (latest result per
 module; every run stays in the audit log). Exit codes: `0` quiet · `3` new critical · `4` a module was blind · `2` not authorized.
 
+### Dashboard — what the client's team sees
+
+```bash
+python -m aegis ui --demo                                   # demo data with planted problems
+sudo aegis ui --state /var/lib/aegis/guard                  # an installed guard (or --config aegis-guard.json)
+ssh -L 8787:127.0.0.1:8787 <server>   # then open http://127.0.0.1:8787 on your own machine
+```
+
+A read-only web page served by AEGIS itself, with no internet and no external scripts. It shows one plain-language
+status line ("All quiet" / "4 new problems, 2 critical" / "the M-Pesa check could not run"), the money flagged, a
+card per check, and tabs for **Problems** (meaning plus evidence for every open finding), **Alerts** (what changed in
+each cycle), **Check history**, **Evidence for legal** (audit-chain verification, who authorized the work and until
+when, the tool build fingerprint, downloads of the report and audit log) and the **Website check** form. It refreshes
+every minute. It listens on 127.0.0.1 only unless `AEGIS_UI_PASSWORD` is set. Client data is always rendered as text,
+and a strict per-response CSP blocks injected scripts. Only the listed evidence files can be downloaded.
+
 ### Selftest — proof for you and for the client
 
 ```bash

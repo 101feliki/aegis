@@ -583,14 +583,16 @@ def analyse(stmt: dict | None, cbs: dict | None, wallet: dict | None, allow: lis
                 if rc in flagged:
                     continue
                 when = e.get("when") or e.get("received")
+                # Callback-level findings carry no money figure: the money is counted once, where it
+                # actually reached a wallet (FORGED_CREDIT / CREDIT_EXCEEDS_PAID), never three times.
                 if rc not in st_in:
                     if in_stmt(when):
                         flagged.add(rc)
-                        F.add("FAKE_CALLBACK", e.get("amount"), receipt=rc, claimed_amount=money(e.get("amount")),
+                        F.add("FAKE_CALLBACK", None, receipt=rc, claimed_amount=money(e.get("amount")),
                               kind=e["kind"], ip=e.get("ip"), phone=e.get("phone"))
                 elif e.get("amount") is not None and abs(e["amount"] - st_in[rc]["amount"]) > tol:
                     flagged.add(rc)
-                    F.add("CALLBACK_AMOUNT_MISMATCH", max(e["amount"] - st_in[rc]["amount"], ZERO) or None,
+                    F.add("CALLBACK_AMOUNT_MISMATCH", None,
                           receipt=rc, callback_says=money(e["amount"]), mpesa_recorded=money(st_in[rc]["amount"]),
                           ip=e.get("ip"))
         with_ip = [e for e in events if e.get("ip")]
@@ -612,7 +614,7 @@ def analyse(stmt: dict | None, cbs: dict | None, wallet: dict | None, allow: lis
                             "unless your own proxy sets it).")
         for e, a in public:
             if not any(a in n for n in allow_nets):
-                F.add("CALLBACK_FROM_UNKNOWN_SOURCE", e.get("amount") if e["result"] == 0 else None,
+                F.add("CALLBACK_FROM_UNKNOWN_SOURCE", None,
                       ip=e["ip"], ref=e.get("receipt") or e.get("checkout") or e.get("conv"), kind=e["kind"],
                       result=e["result"], amount=money(e.get("amount")))
 

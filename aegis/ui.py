@@ -49,6 +49,7 @@ PAGE = """<!doctype html><html lang="en"><head><meta charset="utf-8">
  .warn{{color:var(--warn);font-size:13px;margin-top:10px}}
  a{{color:var(--ac)}}
 </style></head><body><div class="wrap">
+ <p style="margin:0 0 10px"><a href="/">&larr; Monitor</a></p>
  <h1>{tool} <span style="color:var(--mut);font-weight:400">v{ver}</span></h1>
  <p class="sub">Authorized, auditable footprinting. Enter a website — AEGIS structures the IP/infra exposure. Local console (127.0.0.1) only.</p>
  <div class="card">

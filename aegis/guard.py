@@ -105,7 +105,7 @@ class Config:
 
     def mod(self, name: str) -> dict:
         m = dict(self.modules.get(name) or {})
-        for k in ("db", "map", "statement", "callbacks", "allow_ips"):
+        for k in ("db", "map", "statement", "callbacks", "allow_ips", "root"):
             if m.get(k):
                 m[k] = self.p(m[k])
         m["app_dirs"] = [self.p(x) for x in m.get("app_dirs") or []]
@@ -183,7 +183,11 @@ def _authorizer(cfg: Config, machine: str):
     if ns.scope and not os.path.exists(ns.scope):
         print(f"scope file not found: {ns.scope}", file=sys.stderr)
         return None
-    return _session(ns, [s for s in sources if s], acts, extra_scope={"servers": [machine], "paths": paths})
+    servers = [machine]
+    if "host" in cfg.modules and cfg.mod("host").get("root"):       # checking a server image, not this machine
+        from .checks.host import Host, machine_name
+        servers.append(machine_name(Host(cfg.mod("host")["root"])))
+    return _session(ns, [s for s in sources if s], acts, extra_scope={"servers": servers, "paths": paths})
 
 
 def run_ledger(cfg: Config, authz, sink: list) -> None:
