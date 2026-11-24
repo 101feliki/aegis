@@ -6,10 +6,10 @@
 
 | Source | Ability | Labels |
 |---|---|---|
-| `agent/provider.go` | Outbound LLM client; optional custom UA (`ValidateUserAgent`, max 256B), `ARTEX_LLM_PROXY`, session header key | 🟡 ⚪ |
-| `llmpool/` (pool.go, health.go) | Multi-provider pool, health/priority routing | ⚪ |
-| `db/config.go` (profile cols incl. `api_key`) | Stores provider profiles + keys | 🟡 |
-| Provider endpoints | Anthropic `/v1/messages`; OpenAI-compatible `/chat/completions` or `/responses`; Ollama `127.0.0.1:11434/v1` | 🟡 |
+| `agent/provider.go` | Outbound LLM client; optional custom UA (`ValidateUserAgent`, max 256B), `ARTEX_LLM_PROXY`, session header key | |
+| `llmpool/` (pool.go, health.go) | Multi-provider pool, health/priority routing | |
+| `db/config.go` (profile cols incl. `api_key`) | Stores provider profiles + keys | |
+| Provider endpoints | Anthropic `/v1/messages`; OpenAI-compatible `/chat/completions` or `/responses`; Ollama `127.0.0.1:11434/v1` | |
 
 ## The double edge (RISK-REGISTER R3)
 - Whatever the agent reasons over — **authenticated bank requests/responses, tokens, PII, balances** —
@@ -21,7 +21,7 @@
   Advise banks to require local-only inference for any AI pentest tool. This is a concrete policy you can
   write into bank procurement.
 
-## 🟢 Detection opportunities
+## Detection opportunities
 - This traffic goes operator → LLM provider, **not** to the bank, so the bank can't see it directly.
 - Relevant instead for **the operator's own** egress monitoring, and for your lab discipline
   (use Ollama, no production keys, no real customer data in demos).

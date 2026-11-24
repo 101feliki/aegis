@@ -98,11 +98,11 @@ validated, quoted identifiers. Give AEGIS a SELECT-only database user as well.
 
 | Engine | Tested live | Read-only enforcement | Admin account given? |
 |---|---|---|---|
-| MySQL 8 (pymysql) | ✅ 13/13 | Session `READ ONLY`, verified before any read | Runs read-only + **least-privilege finding** in report |
-| PostgreSQL 16 (pg8000, or psycopg) | ✅ 13/13 | Session `READ ONLY`, verified before any read | Runs read-only + **least-privilege finding** in report |
-| SQL Server 2022 (pyodbc) | ✅ 13/13 | No session mode exists → **login must be read-only** | **Refuses to run** (use a `db_datareader` login) |
-| SQLite / CSV export | ✅ 13/13 | File opened `mode=ro` / private in-memory copy | n/a |
-| Oracle (oracledb) | ⚠ coded, not yet tested | `SET TRANSACTION READ ONLY` | — |
+| MySQL 8 (pymysql) | 13/13 | Session `READ ONLY`, verified before any read | Runs read-only + **least-privilege finding** in report |
+| PostgreSQL 16 (pg8000, or psycopg) | 13/13 | Session `READ ONLY`, verified before any read | Runs read-only + **least-privilege finding** in report |
+| SQL Server 2022 (pyodbc) | 13/13 | No session mode exists → **login must be read-only** | **Refuses to run** (use a `db_datareader` login) |
+| SQLite / CSV export | 13/13 | File opened `mode=ro` / private in-memory copy | n/a |
+| Oracle (oracledb) | coded, not yet tested | `SET TRANSACTION READ ONLY` | — |
 
 On locked-down hosts (e.g. Windows Application Control) compiled drivers can be blocked from loading;
 AEGIS detects this, skips them, and uses a pure-Python driver (`pymysql`, `pg8000`). Exit code `3` = critical
@@ -212,9 +212,9 @@ suspected webshell, a script in an upload folder or an edited baseline — that 
 
 | Engine | Triggers | Routines | Columns |
 |---|---|---|---|
-| PostgreSQL 16 | ✅ tested live (read-only login) | ✅ | ✅ |
-| MySQL 8 | ⚠ **hidden** from read-only logins (seeing them needs the TRIGGER privilege, which can also create them — not requested). Workaround tested live: DBA schedules `mysqldump --no-data --triggers --routines --skip-dump-date db \| sed 's/ AUTO_INCREMENT=[0-9]*//' > …/db-schema.sql`, watched with `--path` | ✅ with `GRANT SHOW_ROUTINE` (read-only) | ✅ |
-| SQLite | ✅ | n/a | ✅ |
+| PostgreSQL 16 | tested live (read-only login) | | |
+| MySQL 8 | **hidden** from read-only logins (seeing them needs the TRIGGER privilege, which can also create them — not requested). Workaround tested live: DBA schedules `mysqldump --no-data --triggers --routines --skip-dump-date db \| sed 's/ AUTO_INCREMENT=[0-9]*//' > …/db-schema.sql`, watched with `--path` | with `GRANT SHOW_ROUTINE` (read-only) | |
+| SQLite | | n/a | |
 | SQL Server / Oracle | coded, not yet tested live (SQL Server needs `VIEW DEFINITION`) | | |
 
 ### AEGIS guard — the installed product

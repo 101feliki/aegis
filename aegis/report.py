@@ -124,7 +124,7 @@ def build_markdown(audit_path: str) -> str:
     lines.append("")
     # Honesty banner: empty findings can mean "clean" OR "we were blocked".
     if inconclusive:
-        lines.append("> **⚠ INCONCLUSIVE RUN - DO NOT READ AS 'CLEAN'.** "
+        lines.append("> **INCONCLUSIVE RUN - DO NOT READ AS 'CLEAN'.** "
                      f"All {http_ran} HTTP probe(s) were blocked or errored "
                      "(the edge/WAF returned 403/429/503 or the host was unreachable), "
                      "so the passive HTTP checks could not evaluate the site. "

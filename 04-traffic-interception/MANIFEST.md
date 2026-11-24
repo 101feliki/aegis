@@ -6,10 +6,10 @@
 
 | Source | Ability | Labels |
 |---|---|---|
-| `traffic/` (proxy.go, stream.go, replay.go, rewrite/, archive.go) | Recording MITM proxy on **:8788** using `go-mitmproxy v1.9.2` with a **generated CA**. Records, rewrites, replays HTTP(S) | 🔴 🟡 🟢 |
-| `extension/` (manifest.json, background.js, popup.*) | Chrome MV3 extension "ARTEX Traffic Capture". Permissions: **`debugger`, `storage`, `tabs`** + host `<all_urls>`. Posts batches to `POST /api/traffic/ingest` (≤50 entries, bodies truncated 256 KiB, binary skipped) | 🔴 🟠 🟡 |
-| `llmrec/` (capture.go) | Captures LLM-visible records of traffic for the agent | 🟡 |
-| `traffic/external.go`, `evidence.go` | Ties captured request/response pairs to findings as evidence | 🟢 |
+| `traffic/` (proxy.go, stream.go, replay.go, rewrite/, archive.go) | Recording MITM proxy on **:8788** using `go-mitmproxy v1.9.2` with a **generated CA**. Records, rewrites, replays HTTP(S) | |
+| `extension/` (manifest.json, background.js, popup.*) | Chrome MV3 extension "ARTEX Traffic Capture". Permissions: **`debugger`, `storage`, `tabs`** + host `<all_urls>`. Posts batches to `POST /api/traffic/ingest` (≤50 entries, bodies truncated 256 KiB, binary skipped) | |
+| `llmrec/` (capture.go) | Captures LLM-visible records of traffic for the agent | |
+| `traffic/external.go`, `evidence.go` | Ties captured request/response pairs to findings as evidence | |
 
 ## The double edge (see RISK-REGISTER R1, R4)
 - **R1 — extension `debugger` on `<all_urls>`:** reads *every* site's traffic on the operator's
@@ -22,7 +22,7 @@
   API flows a WAF would otherwise consider trusted traffic.
 - Session replay + rewrite = probing transaction endpoints with a valid token.
 
-## 🟢 Detection opportunities (→ segment 10)
+## Detection opportunities (→ segment 10)
 - **Go TLS client fingerprint (JA3/JA4)** from go-mitmproxy's outbound connections — likely the
   strongest, config-resistant network signal. **Confirm in lab.**
 - Replay patterns: identical request shapes resent with small mutations (rewrite engine).

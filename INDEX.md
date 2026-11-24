@@ -22,11 +22,11 @@ Source reviewed: clone of `main`, 950 commits, history rewritten 2026-10-23. Sta
 
 | Label | Meaning |
 |---|---|
-| 🔴 **OFFENSIVE-TARGET** | Capability pointed outward at a victim (the bank). The thing we defend against. |
-| 🟠 **TURNS-ON-OPERATOR** | Can be turned against the person *running* ARTEX, or against innocent third parties. The dangerous edge. |
-| 🟡 **OPERATOR-EXPOSURE** | Leaks or endangers the operator even without malice (data egress, trust, local exec). |
-| 🟢 **DETECTABLE** | Produces a signal a bank's blue team can catch. Our product hooks here. |
-| ⚪ **INFRA** | Plumbing. Low direct security value, listed for completeness. |
+| **OFFENSIVE-TARGET** | Capability pointed outward at a victim (the bank). The thing we defend against. |
+| **TURNS-ON-OPERATOR** | Can be turned against the person *running* ARTEX, or against innocent third parties. The dangerous edge. |
+| **OPERATOR-EXPOSURE** | Leaks or endangers the operator even without malice (data egress, trust, local exec). |
+| **DETECTABLE** | Produces a signal a bank's blue team can catch. Our product hooks here. |
+| **INFRA** | Plumbing. Low direct security value, listed for completeness. |
 
 A single module often carries several labels — that is the whole point of this map.
 
@@ -36,16 +36,16 @@ A single module often carries several labels — that is the whole point of this
 
 | # | Folder | What it covers | Dominant labels |
 |---|---|---|---|
-| 01 | `01-recon-discovery` | Asset discovery, subdomains, API endpoint harvesting | 🔴 🟢 |
-| 02 | `02-exploitation` | Web/API attack skills, LFI→RCE, N-day building | 🔴 🟢 |
-| 03 | `03-mobile-binary-re` | APK/IPA + binary reverse engineering, source audit | 🔴 |
-| 04 | `04-traffic-interception` | MITM proxy + browser `debugger` extension | 🔴 🟠 🟡 🟢 |
-| 05 | `05-agent-brain` | Planner/workers, graphs, budgets, self-improvement | 🔴 🟠 |
-| 06 | `06-command-execution` | Local interpreter execution + approval gates | 🟠 🟡 |
-| 07 | `07-data-egress-llm` | Captured bank traffic shipped to LLM providers | 🟡 🟠 |
-| 08 | `08-evidence-reporting` | Findings, reports, notification channels | 🟡 ⚪ |
-| 09 | `09-operator-trust-boundary` | **The "turns on you" cluster — read this one** | 🟠 🟡 |
-| 10 | `10-defense-signals` | Confirmed + candidate fingerprints → our rules | 🟢 |
+| 01 | `01-recon-discovery` | Asset discovery, subdomains, API endpoint harvesting | |
+| 02 | `02-exploitation` | Web/API attack skills, LFI→RCE, N-day building | |
+| 03 | `03-mobile-binary-re` | APK/IPA + binary reverse engineering, source audit | |
+| 04 | `04-traffic-interception` | MITM proxy + browser `debugger` extension | |
+| 05 | `05-agent-brain` | Planner/workers, graphs, budgets, self-improvement | |
+| 06 | `06-command-execution` | Local interpreter execution + approval gates | |
+| 07 | `07-data-egress-llm` | Captured bank traffic shipped to LLM providers | |
+| 08 | `08-evidence-reporting` | Findings, reports, notification channels | |
+| 09 | `09-operator-trust-boundary` | **The "turns on you" cluster — read this one** | |
+| 10 | `10-defense-signals` | Confirmed + candidate fingerprints → our rules | |
 
 ---
 
@@ -55,8 +55,8 @@ A single module often carries several labels — that is the whole point of this
    two that change what you build and sell.
 2. For each bank-facing surface (portal, mobile app, API, M-Pesa integration), trace it through
    01 → 02 → 04 to see how ARTEX would chain an attack.
-3. Every 🟢 line in these manifests is a candidate detection rule. `10-defense-signals` collects them.
-4. `RISK-REGISTER.md` is the flat list of the 🟠 / 🟡 items — the double-edged functions,
+3. Every line in these manifests is a candidate detection rule. `10-defense-signals` collects them.
+4. `RISK-REGISTER.md` is the flat list of the / items — the double-edged functions,
    ranked by how badly they can turn on the operator.
 
 See `RISK-REGISTER.md` for the dual-use ranking.

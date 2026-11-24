@@ -6,10 +6,10 @@
 
 | Source | Ability | Labels |
 |---|---|---|
-| `evidence/store.go` | Stores captured request/response evidence per finding | 🟡 🟢 |
-| `report/` (findings.go, quality.go, report.go) | Builds findings, scores quality, exports reports | ⚪ |
-| `notify/` (webhook, telegram, feishu, dingtalk, wecom, email, mask.go, redact, ssrf_test) | Sends events/findings to external channels; has masking/redaction + SSRF awareness | 🟡 |
-| `server/server.go:2362` | `artex-finding-export-*` temp staging for exports | ⚪ |
+| `evidence/store.go` | Stores captured request/response evidence per finding | |
+| `report/` (findings.go, quality.go, report.go) | Builds findings, scores quality, exports reports | |
+| `notify/` (webhook, telegram, feishu, dingtalk, wecom, email, mask.go, redact, ssrf_test) | Sends events/findings to external channels; has masking/redaction + SSRF awareness | |
+| `server/server.go:2362` | `artex-finding-export-*` temp staging for exports | |
 
 ## The double edge (RISK-REGISTER R8)
 - `notify/` ships finding data **off-box** to chat platforms. Redaction/masking exists but is
@@ -20,7 +20,7 @@
 - The evidence model ("every finding carries the request/response that justifies it") is a **feature to
   copy** in our own detection product: when we flag ARTEX-like activity, attach the captured traffic that
   proves it. Mirrors how banks' SOC analysts want alerts delivered.
-- 🟢 Nothing target-facing here; this is internal plumbing. Listed for completeness.
+- Nothing target-facing here; this is internal plumbing. Listed for completeness.
 
 ## Source in this folder
 

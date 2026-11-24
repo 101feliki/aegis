@@ -1,6 +1,6 @@
 # 10 · Defense Signals — our product surface
 
-Every 🟢 from the other segments, collected and graded. These become our rule packs
+Every from the other segments, collected and graded. These become our rule packs
 (WAF / Suricata / Sigma) and our behavioural detectors. **Status = confirmed in source / needs lab.**
 
 ## Signal table

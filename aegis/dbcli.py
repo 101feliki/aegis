@@ -226,18 +226,18 @@ def signoff_sheet(m: dict) -> str:
             L.append("")
             continue
         L += ["", "| Column | Used as | Correct? |", "|---|---|---|"]
-        L += [f"| `{c}` | {ROLE_PLAIN.get(r, r)} | ☐ yes ☐ no: |" for r, c in sec["columns"].items()]
+        L += [f"| `{c}` | {ROLE_PLAIN.get(r, r)} | [ ] yes [ ] no: |" for r, c in sec["columns"].items()]
         vals = sec.get("status_values") or sec.get("type_values")
         if vals:
             L += ["", "| Code in your data | AEGIS reads it as | Correct? |", "|---|---|---|"]
-            L += [f"| `{v}` | {MEANING_PLAIN.get(meaning, meaning)} | ☐ yes ☐ no: |" for v, meaning in vals.items()]
+            L += [f"| `{v}` | {MEANING_PLAIN.get(meaning, meaning)} | [ ] yes [ ] no: |" for v, meaning in vals.items()]
         if kind == "transactions":
             sign = {"signed": "amounts carry their own +/- sign", "by_direction": "a credit/debit column gives the sign",
                     "by_type": "amounts are positive; the transaction type decides credit or debit"}
-            L += ["", f"Money direction: {sign.get(sec.get('amount_sign'), sec.get('amount_sign'))}. ☐ correct"]
+            L += ["", f"Money direction: {sign.get(sec.get('amount_sign'), sec.get('amount_sign'))}. [ ] correct"]
             if sec.get("bet_ref_pattern"):
                 L.append(f"Bet reference: the bet number is taken from the reference using pattern "
-                         f"`{sec['bet_ref_pattern']}`. ☐ correct")
+                         f"`{sec['bet_ref_pattern']}`. [ ] correct")
         L.append("")
     L += [f"Currency: {m.get('currency', 'KES')} · rounding tolerance: {m.get('tolerance', '1.00')}", ""]
     if m.get("review_required"):
